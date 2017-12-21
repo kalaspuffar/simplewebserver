@@ -4,6 +4,8 @@ import org.ea.Endpoint;
 import org.ea.repositories.NotesRepository;
 import org.json.simple.JSONObject;
 
+import java.util.UUID;
+
 public class NotesCollection extends Endpoint {
     private final NotesRepository notesRepository;
 
@@ -12,12 +14,24 @@ public class NotesCollection extends Endpoint {
     }
 
     public Object handleGET(Object request) {
+        this.setResponseCode(200);
         return this.notesRepository.getNotes();
     }
 
     public Object handlePOST(Object request) {
+        if(!(request instanceof JSONObject)) {
+            this.setResponseCode(500);
+            return "Not a valid json object.";
+        }
+        JSONObject jsonObject = (JSONObject)request;
+        if(!jsonObject.containsKey("text")) {
+            this.setResponseCode(500);
+            return "No text";
+        }
 
-        return null;
+        notesRepository.addNote((String) jsonObject.get("text"));
+        this.setResponseCode(201);
+        return "";
     }
 
     public Object handlePATCH(Object request) {

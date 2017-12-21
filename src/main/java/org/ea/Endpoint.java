@@ -4,9 +4,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class Endpoint {
+    private Map<String, String> pathParam = new HashMap<>();
     private int responseCode;
-    private String errorMessage;
 
     public abstract Object handleGET(Object request);
     public abstract Object handlePOST(Object request);
@@ -16,10 +19,6 @@ public abstract class Endpoint {
 
     public int getResponseCode() {
         return responseCode;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
     }
 
     public String handleRequest(String requestMethod, String requestBody) {
@@ -45,12 +44,31 @@ public abstract class Endpoint {
         if(respObj == null) {
             return "";
         }
+        if(respObj instanceof String) {
+            return (String)respObj;
+        }
         if(respObj instanceof JSONObject) {
-            return ((JSONObject)respObj).toString();
+            return ((JSONObject)respObj).toJSONString();
         }
         if(respObj instanceof JSONArray) {
-            return ((JSONArray)respObj).toString();
+            return ((JSONArray)respObj).toJSONString();
         }
         return "";
+    }
+
+    public void setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
+    }
+
+    public void addPathParam(String key, String value) {
+        pathParam.put(key, value);
+    }
+
+    public String getPathParam(String key) {
+        return pathParam.get(key);
+    }
+
+    public boolean hasPathParam(String id) {
+        return pathParam.containsKey(id);
     }
 }

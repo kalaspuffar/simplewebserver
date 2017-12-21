@@ -46,25 +46,6 @@ public class RequestHandler implements HttpHandler {
         os.close();
     }
 
-    /*
-
-Access-control-allow-headers: content-type
-Access-control-allow-methods: GET,PUT,POST,PATCH,DELETE
-Access-control-allow-origin: http://localhost:8081
-Access-control-allow-credentials: true
-
-Access-Control-Allow-Origin: http://localhost:8081
-Access-Control-Allow-Credentials: true
-Access-Control-Allow-Methods: GET,PUT,POST,PATCH,DELETE
-Access-Control-Allow-Headers: content-type
-
-
-
-     */
-
-
-
-
     private void handleOPTION(HttpExchange t) throws IOException {
         System.out.println("OPTIONS");
         t.getResponseHeaders().add("Connection", "keep-alive");

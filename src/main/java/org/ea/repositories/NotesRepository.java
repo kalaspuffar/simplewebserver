@@ -4,6 +4,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public class NotesRepository {
     private NotesRepository() {
         JSONObject note = new JSONObject();
         note.put("id", UUID.randomUUID().toString());
-        note.put("message", "Working!");
+        note.put("text", "Working!");
         notes.add(note);
     }
 
@@ -34,20 +35,34 @@ public class NotesRepository {
     public void addNote(String value) {
         JSONObject note = new JSONObject();
         note.put("id", UUID.randomUUID().toString());
-        note.put("message", value);
+        note.put("text", value);
         this.notes.add(note);
     }
 
-    public void updateNote(String key, String value) {
+    public JSONObject updateNote(String key, String value) {
         for (Object o : notes) {
             JSONObject note = (JSONObject)o;
             if(key.equals(note.get("id"))) {
-                note.put("message", value);
+                note.put("text", value);
+                return note;
             }
         }
+        return null;
     }
 
     public JSONArray getNotes() {
        return notes;
+    }
+
+    public boolean deleteNote(String key) {
+        Iterator<Object> it = notes.iterator();
+        while(it.hasNext()) {
+            JSONObject note = (JSONObject)it.next();
+            if(key.equals(note.get("id"))) {
+                it.remove();
+                return true;
+            }
+        }
+        return false;
     }
 }
