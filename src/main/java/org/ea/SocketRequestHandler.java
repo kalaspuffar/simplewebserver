@@ -11,17 +11,9 @@ import java.util.regex.Pattern;
 
 public class SocketRequestHandler {
     private static final int BUFFER_SIZE = 65535;
-    private Map<Integer, String> responseMessages = new HashMap<>();
     private Map<String, Endpoint> endpointMap = new HashMap<String, Endpoint>();
 
     public SocketRequestHandler() {
-        responseMessages.put(200, "OK");
-        responseMessages.put(201, "Created");
-        responseMessages.put(204, "No Content");
-        responseMessages.put(404, "Not Found");
-        responseMessages.put(500, "Internal Server Error");
-        responseMessages.put(501, "Not Implemented");
-
         endpointMap.put("/notes", new NotesCollection(NotesRepository.getInstance()));
         endpointMap.put("/notes/{id}", new NotesItem(NotesRepository.getInstance()));
     }
@@ -39,7 +31,7 @@ public class SocketRequestHandler {
     }
 
     private void setResponseBody(PrintWriter out, String s, int responseCode) {
-        out.println("HTTP/1.1 " + responseCode + " " + responseMessages.get(responseCode));
+        out.println("HTTP/1.1 " + responseCode + " " + HttpResponseMessages.getResponse(responseCode));
         out.println("Connection: keep-alive");
         out.println("Access-Control-Allow-Credentials: true");
         out.println("Access-Control-Allow-Origin: http://localhost:8081");
@@ -52,7 +44,7 @@ public class SocketRequestHandler {
     }
 
     private void handleOPTION(PrintWriter out) {
-        out.println("HTTP/1.1 204 " + responseMessages.get(204));
+        out.println("HTTP/1.1 204 " + HttpResponseMessages.getResponse(204));
         out.println("Connection: keep-alive");
         out.println("Access-Control-Allow-Credentials: true");
         out.println("Access-Control-Allow-Origin: http://localhost:8081");
