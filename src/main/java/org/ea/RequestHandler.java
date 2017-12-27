@@ -5,12 +5,11 @@ import com.sun.net.httpserver.HttpHandler;
 import org.ea.controllers.notes.NotesCollection;
 import org.ea.controllers.notes.NotesItem;
 import org.ea.repositories.NotesRepository;
-import sun.net.httpserver.MyHttpExchangeImpl;
 
 import java.io.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RequestHandler implements HttpHandler {
 
@@ -58,19 +57,41 @@ public class RequestHandler implements HttpHandler {
         t.sendResponseHeaders(204, 0);
     }
 
-    public Endpoint getEndpoint(String s) {
-        return endpointMap.get(s);
-    }
 
+    private Endpoint getEndpoint(String s) {
+        Pattern keyPattern = Pattern.compile("\\{([a-zA-Z]+)\\}");
+        Endpoint ep = null;
+        for(String path : endpointMap.keySet()) {
+            List<String> keys = new ArrayList<>();
+            String testPath = path;
+            Matcher m = keyPattern.matcher(path);
+            while(m.find()) {
+                String key = m.group();
+                keys.add(m.group().substring(1, key.length() - 1));
+                testPath = testPath.replace(key, "([^\\/]+)");
+            }
+
+            Pattern testPattern = Pattern.compile("^" + testPath + "$");
+            if(s == null) return null;
+            Matcher stringMatcher = testPattern.matcher(s);
+            if(!stringMatcher.matches() || stringMatcher.groupCount() != keys.size()) continue;
+            ep = endpointMap.get(path);
+
+            for(int i=0; i<keys.size(); i++) {
+                String value = stringMatcher.group(i+1);
+                ep.addPathParam(keys.get(i), value);
+            }
+            return ep;
+        }
+        return ep;
+    }
     @Override
     public void handle(HttpExchange t) throws IOException {
-        MyHttpExchangeImpl mt = new MyHttpExchangeImpl(t);
-
-        if(mt.getRequestMethod().equals("OPTIONS")) {
-            this.handleOPTION(mt);
+        if(t.getRequestMethod().equals("OPTIONS")) {
+            this.handleOPTION(t);
         }
-        Endpoint ep = this.getEndpoint(mt.getRequestURI().getPath());
-        String resp = ep.handleRequest(mt.getRequestMethod(), this.getRequestBody(mt));
-        this.setResponseBody(mt, resp, ep.getResponseCode());
+        Endpoint ep = this.getEndpoint(t.getRequestURI().getPath());
+        String resp = ep.handleRequest(t.getRequestMethod(), this.getRequestBody(t));
+        this.setResponseBody(t, resp, ep.getResponseCode());
     }
 }
