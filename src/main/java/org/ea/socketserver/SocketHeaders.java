@@ -1,4 +1,4 @@
-package org.ea;
+package org.ea.socketserver;
 
 import java.io.BufferedReader;
 import java.util.HashMap;

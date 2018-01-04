@@ -1,5 +1,7 @@
-package org.ea;
+package org.ea.socketserver;
 
+import org.ea.Endpoint;
+import org.ea.HttpResponseMessages;
 import org.ea.controllers.notes.NotesCollection;
 import org.ea.controllers.notes.NotesItem;
 import org.ea.repositories.NotesRepository;

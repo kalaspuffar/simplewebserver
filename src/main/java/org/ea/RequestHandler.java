@@ -61,10 +61,10 @@ public class RequestHandler implements HttpHandler {
     private Endpoint getEndpoint(String s) {
         Pattern keyPattern = Pattern.compile("\\{([a-zA-Z]+)\\}");
         Endpoint ep = null;
-        for(String path : endpointMap.keySet()) {
+        for(Map.Entry<String, Endpoint> entity : endpointMap.entrySet()) {
             List<String> keys = new ArrayList<>();
-            String testPath = path;
-            Matcher m = keyPattern.matcher(path);
+            String testPath = entity.getKey();
+            Matcher m = keyPattern.matcher(testPath);
             while(m.find()) {
                 String key = m.group();
                 keys.add(m.group().substring(1, key.length() - 1));
@@ -75,7 +75,7 @@ public class RequestHandler implements HttpHandler {
             if(s == null) return null;
             Matcher stringMatcher = testPattern.matcher(s);
             if(!stringMatcher.matches() || stringMatcher.groupCount() != keys.size()) continue;
-            ep = endpointMap.get(path);
+            ep = entity.getValue();
 
             for(int i=0; i<keys.size(); i++) {
                 String value = stringMatcher.group(i+1);
@@ -85,6 +85,7 @@ public class RequestHandler implements HttpHandler {
         }
         return ep;
     }
+
     @Override
     public void handle(HttpExchange t) throws IOException {
         if(t.getRequestMethod().equals("OPTIONS")) {

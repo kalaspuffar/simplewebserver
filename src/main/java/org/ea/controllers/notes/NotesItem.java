@@ -25,6 +25,7 @@ public class NotesItem extends Endpoint {
     public NotesItem(NotesRepository notesRepository) {
         this.notesRepository = notesRepository;
     }
+
     public Object handleGET(Object request) {
         JSONObject jsonObject = checkValid(request);
         if(jsonObject == null) return errorMessage;
