@@ -12,6 +12,9 @@ public class SimpleServer {
             HttpServer server = HttpServer.create(new InetSocketAddress(SERVER_PORT), 0);
             server.createContext("/", new RequestHandler());
             server.setExecutor(null); // creates a default executor
+            if(args.length > 0 && "debug".equalsIgnoreCase(args[0])) {
+                System.exit(0);
+            }
             server.start();
             System.out.println("Server started at " + SERVER_PORT);
         } catch (Exception e) {
